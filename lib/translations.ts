@@ -168,6 +168,9 @@ const translations = {
       send: "Send email",
       subject: "Subject",
       body: "Message",
+      recipientLanguage: "Target recipient language",
+      generating: "Generating email in the selected language…",
+      regenerateFailed: "Could not generate the email in that language. Try again.",
     },
     empty: {
       title: "No audit results yet",

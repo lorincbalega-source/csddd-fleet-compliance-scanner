@@ -16,7 +16,10 @@ export async function POST(request: NextRequest) {
       const body = await request.json();
 
       if (body.useMock) {
-        const result = await runAudit({ useMock: true });
+        const result = await runAudit({
+          useMock: true,
+          recipientLanguage: typeof body.recipientLanguage === "string" ? body.recipientLanguage : undefined,
+        });
         return NextResponse.json(result);
       }
 
@@ -32,9 +35,12 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("file");
     const useMock = formData.get("useMock") === "true";
+    const recipientLanguageRaw = formData.get("recipientLanguage");
+    const recipientLanguage =
+      typeof recipientLanguageRaw === "string" ? recipientLanguageRaw : undefined;
 
     if (useMock) {
-      const result = await runAudit({ useMock: true });
+      const result = await runAudit({ useMock: true, recipientLanguage });
       return NextResponse.json(result);
     }
 
@@ -42,7 +48,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "NO_FILE" }, { status: 400 });
     }
 
-    const result = await runAudit({ file });
+    const result = await runAudit({ file, recipientLanguage });
     return NextResponse.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : "AUDIT_FAILED";

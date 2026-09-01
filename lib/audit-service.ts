@@ -1,4 +1,4 @@
-import type { AuditResult } from "./types";
+import type { AuditResult, DocumentDetails, FollowUpEmail, VerificationCheckItem } from "./types";
 import { buildMockAuditResult } from "./mock-data";
 import {
   DOCKIFY_AUDIT_SYSTEM_PROMPT,
@@ -8,9 +8,11 @@ import {
 import {
   extractDocumentText,
   fileToImageDataUrl,
+  generateFollowUpEmail,
   isImageFile,
   runOpenAIAudit,
 } from "./openai-audit";
+import { resolveRecipientLanguage } from "./languages";
 
 const ACCEPTED_TYPES = [
   "application/pdf",
@@ -30,7 +32,7 @@ export const auditPromptConfig = {
   buildUserPrompt: buildAuditUserPrompt,
 };
 
-async function analyzeDocument(file: File): Promise<AuditResult> {
+async function analyzeDocument(file: File, recipientLanguage?: string): Promise<AuditResult> {
   const documentText = await extractDocumentText(file);
   const imageDataUrl = isImageFile(file) ? await fileToImageDataUrl(file) : undefined;
 
@@ -38,12 +40,14 @@ async function analyzeDocument(file: File): Promise<AuditResult> {
     fileName: file.name,
     documentText,
     imageDataUrl,
+    recipientLanguage,
   });
 }
 
 export async function runAudit(options: {
   useMock?: boolean;
   file?: File;
+  recipientLanguage?: string;
 }): Promise<AuditResult> {
   if (options.useMock) {
     await delay(SIMULATED_DELAY_MS);
@@ -63,7 +67,18 @@ export async function runAudit(options: {
     throw new Error("FILE_TOO_LARGE");
   }
 
-  return analyzeDocument(options.file);
+  return analyzeDocument(options.file, options.recipientLanguage);
+}
+
+export async function runFollowUpEmail(options: {
+  recipientLanguage?: string;
+  document: DocumentDetails;
+  discrepancies: string[];
+  checklist: VerificationCheckItem[];
+  sourceFile?: string;
+}): Promise<FollowUpEmail> {
+  resolveRecipientLanguage(options.recipientLanguage);
+  return generateFollowUpEmail(options);
 }
 
 function delay(ms: number): Promise<void> {

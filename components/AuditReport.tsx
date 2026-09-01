@@ -34,7 +34,7 @@ export function AuditReport({ result, t }: AuditReportProps) {
       <DocumentDetailsCard document={result.document} t={t} />
       <ComplianceChecklistTable checklist={result.checklist} t={t} />
       <DiscrepanciesSummary discrepancies={result.discrepancies} t={t} />
-      <FollowUpEmailTemplate email={result.followUpEmail} t={t} />
+      <FollowUpEmailTemplate result={result} t={t} />
     </div>
   );
 }

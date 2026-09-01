@@ -188,6 +188,29 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
   },
 ];
 
+export const EMAIL_RECIPIENT_LANGUAGE_IDS = ["de", "ro", "pl", "hu", "en"] as const;
+
+export type EmailRecipientLanguageId = (typeof EMAIL_RECIPIENT_LANGUAGE_IDS)[number];
+
+export const EMAIL_RECIPIENT_LANGUAGES: TradeLanguage[] = EMAIL_RECIPIENT_LANGUAGE_IDS.map(
+  (id) => TRADE_LANGUAGES.find((lang) => lang.id === id)!,
+);
+
+export function isEmailRecipientLanguageId(value: string): value is EmailRecipientLanguageId {
+  return (EMAIL_RECIPIENT_LANGUAGE_IDS as readonly string[]).includes(value);
+}
+
+export function resolveRecipientLanguage(id: string | null | undefined): TradeLanguage {
+  const english = EMAIL_RECIPIENT_LANGUAGES.find((lang) => lang.id === "en")!;
+  if (!id) return english;
+  const q = id.trim().toLowerCase();
+  return (
+    EMAIL_RECIPIENT_LANGUAGES.find(
+      (lang) => lang.id === q || lang.name.toLowerCase() === q || lang.nativeName.toLowerCase() === q,
+    ) ?? english
+  );
+}
+
 export function filterTradeLanguages(query: string): TradeLanguage[] {
   const q = query.trim().toLowerCase();
   if (!q) return TRADE_LANGUAGES;

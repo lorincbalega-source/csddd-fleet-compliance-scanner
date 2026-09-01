@@ -8,13 +8,19 @@ import type {
   ChecklistCategoryKey,
   ChecklistLabelKey,
   DocumentCategory,
+  DocumentDetails,
+  FollowUpEmail,
   RiskLevel,
+  VerificationCheckItem,
 } from "./types";
 import {
   DOCKIFY_AUDIT_JSON_SCHEMA,
   buildAuditUserPrompt,
+  buildFollowUpEmailLanguageInstruction,
+  buildFollowUpEmailUserPrompt,
 } from "./audit-prompt";
 import { DOCKIFY_SYSTEM_PROMPT, getOpenAIClient } from "./openai";
+import { resolveRecipientLanguage } from "./languages";
 
 const LABEL_KEYS = new Set<ChecklistLabelKey>([
   "cmrConsignmentNote",
@@ -48,13 +54,15 @@ export async function runOpenAIAudit(options: {
   fileName: string;
   documentText: string;
   imageDataUrl?: string;
+  recipientLanguage?: string;
 }): Promise<AuditResult> {
   const client = getOpenAIClient();
+  const recipientLanguage = resolveRecipientLanguage(options.recipientLanguage).name;
 
   const userContent: ChatCompletionContentPart[] = [
     {
       type: "text",
-      text: buildAuditUserPrompt(options.documentText, options.fileName),
+      text: buildAuditUserPrompt(options.documentText, options.fileName, recipientLanguage),
     },
   ];
 
@@ -66,7 +74,10 @@ export async function runOpenAIAudit(options: {
   }
 
   const messages: ChatCompletionMessageParam[] = [
-    { role: "system", content: DOCKIFY_SYSTEM_PROMPT },
+    {
+      role: "system",
+      content: `${DOCKIFY_SYSTEM_PROMPT}\n\n## Follow-up email language\n${buildFollowUpEmailLanguageInstruction(recipientLanguage)}`,
+    },
     { role: "user", content: userContent },
   ];
 
@@ -97,6 +108,74 @@ export async function runOpenAIAudit(options: {
   }
 
   return normalizeAuditResult(parsed, options.fileName);
+}
+
+const FOLLOW_UP_EMAIL_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["subject", "body"],
+  properties: {
+    subject: { type: "string" },
+    body: { type: "string" },
+  },
+} as const;
+
+export async function generateFollowUpEmail(options: {
+  recipientLanguage?: string;
+  document: DocumentDetails;
+  discrepancies: string[];
+  checklist: VerificationCheckItem[];
+  sourceFile?: string;
+}): Promise<FollowUpEmail> {
+  const client = getOpenAIClient();
+  const recipientLanguage = resolveRecipientLanguage(options.recipientLanguage).name;
+
+  const completion = await client.chat.completions.create({
+    model: "gpt-4o",
+    temperature: 0.2,
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "dockify_follow_up_email",
+        strict: true,
+        schema: FOLLOW_UP_EMAIL_SCHEMA,
+      },
+    },
+    messages: [
+      {
+        role: "system",
+        content: `You are the Dockify Document Auditor email writer.\n${buildFollowUpEmailLanguageInstruction(recipientLanguage)}`,
+      },
+      {
+        role: "user",
+        content: buildFollowUpEmailUserPrompt({
+          recipientLanguage,
+          sourceFile: options.sourceFile,
+          document: options.document as unknown as Record<string, unknown>,
+          discrepancies: options.discrepancies,
+          checklist: options.checklist as unknown as Array<Record<string, unknown>>,
+        }),
+      },
+    ],
+  });
+
+  const content = completion.choices[0]?.message?.content;
+  if (!content) {
+    throw new Error("OPENAI_EMPTY_RESPONSE");
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    throw new Error("OPENAI_INVALID_JSON");
+  }
+
+  const email = parsed as Record<string, unknown>;
+  return {
+    subject: String(email.subject ?? ""),
+    body: String(email.body ?? ""),
+  };
 }
 
 /** OpenAI strict mode requires additionalProperties: false on every object. */

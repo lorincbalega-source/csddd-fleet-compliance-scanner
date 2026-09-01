@@ -48,7 +48,8 @@ Also capture: carrierName, documentDate (YYYY-MM-DD), documentType, documentCate
 - Never expose chain-of-thought; put explanations only in checklist.explanation and discrepancies
 - Use empty string for unknown text fields; use false when signature/stamp cannot be confirmed
 - discrepancies: short strings for blocking issues (especially missing shipper, consignee, plate, weight, signature, or stamp)
-- followUpEmail: professional email requesting the missing fields/documents`;
+- followUpEmail: professional email requesting the missing fields/documents
+- The follow-up email subject and body MUST be written strictly in the selected recipient language, independent of the source document language`;
 
 export const DOCKIFY_AUDIT_JSON_SCHEMA = {
   type: "object",
@@ -172,14 +173,51 @@ export const DOCKIFY_AUDIT_JSON_SCHEMA = {
   },
 } as const;
 
-export function buildAuditUserPrompt(documentText: string, fileName: string): string {
+export function buildFollowUpEmailLanguageInstruction(recipientLanguage: string): string {
+  return `Generate a professional compliance follow-up email regarding the audit findings strictly in ${recipientLanguage}.
+Write both followUpEmail.subject and followUpEmail.body entirely in ${recipientLanguage}.
+Do not use the source document's original language. A Japanese CMR, Chinese invoice, or any other source language must still produce a ${recipientLanguage} email when ${recipientLanguage} is the selected recipient language.
+Keep proper names, plate numbers, shipment references, weights, and dates as extracted.`;
+}
+
+export function buildAuditUserPrompt(
+  documentText: string,
+  fileName: string,
+  recipientLanguage: string,
+): string {
   return `Audit this logistics document as the Dockify Document Auditor.
 Extract and verify shipper, consignee, vehicle plate, cargo weight, and signature/stamp presence.
 Return the JSON audit report only.
+
+${buildFollowUpEmailLanguageInstruction(recipientLanguage)}
 
 Source file: ${fileName}
 
 --- DOCUMENT TEXT START ---
 ${documentText}
 --- DOCUMENT TEXT END ---`;
+}
+
+export function buildFollowUpEmailUserPrompt(options: {
+  recipientLanguage: string;
+  sourceFile?: string;
+  document: Record<string, unknown>;
+  discrepancies: string[];
+  checklist: Array<Record<string, unknown>>;
+}): string {
+  return `${buildFollowUpEmailLanguageInstruction(options.recipientLanguage)}
+
+Return ONLY JSON with "subject" and "body". Do not include markdown.
+
+Source file: ${options.sourceFile ?? "unknown"}
+Document findings (JSON):
+${JSON.stringify(
+  {
+    document: options.document,
+    discrepancies: options.discrepancies,
+    checklist: options.checklist,
+  },
+  null,
+  2,
+)}`;
 }
