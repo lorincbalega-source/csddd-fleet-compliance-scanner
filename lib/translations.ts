@@ -14,7 +14,6 @@ const translations = {
       product: "Product",
       features: "Features",
       pricing: "Pricing",
-      languages: "Languages",
       tryAudit: "Try Instant Audit",
     },
     landing: {
@@ -41,17 +40,6 @@ const translations = {
       emailTitle: "Multi-language Follow-up Emails",
       emailBody:
         "Generate carrier-ready follow-ups the moment an audit fails — copy, send, and keep billing moving.",
-    },
-    languages: {
-      kicker: "Dockify languages",
-      title: "Searchable language selector",
-      subtitle:
-        "Generate audit results and compliance emails natively for European freight lanes and major global trade partners.",
-      searchPlaceholder: "Search target language for document/email...",
-      europe: "EU / Europe",
-      global: "Global trade",
-      empty: "No matching trade languages.",
-      previewPrefix: "Audit results & compliance emails generated natively in",
     },
     pricing: {
       kicker: "Dockify pricing",
@@ -169,6 +157,8 @@ const translations = {
       subject: "Subject",
       body: "Message",
       recipientLanguage: "Target recipient language",
+      europeGroup: "EU / Europe",
+      globalGroup: "Global trade",
       generating: "Generating email in the selected language…",
       regenerateFailed: "Could not generate the email in that language. Try again.",
     },

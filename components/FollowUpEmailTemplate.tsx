@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Mail, Copy, Check, Send, Loader2 } from "lucide-react";
 import type { AuditResult, FollowUpEmail } from "@/lib/types";
 import type { Translations } from "@/lib/translations";
-import { EMAIL_RECIPIENT_LANGUAGES } from "@/lib/languages";
+import { EMAIL_RECIPIENT_LANGUAGES, recipientLanguageLabel } from "@/lib/languages";
 
 interface FollowUpEmailTemplateProps {
   result: AuditResult;
@@ -82,7 +82,7 @@ export function FollowUpEmailTemplate({ result, t }: FollowUpEmailTemplateProps)
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <label className="flex min-w-[220px] flex-1 flex-col gap-1 sm:min-w-[240px]">
+          <label className="flex min-w-[260px] flex-1 flex-col gap-1 sm:min-w-[280px]">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
               {t.email.recipientLanguage}
             </span>
@@ -92,11 +92,20 @@ export function FollowUpEmailTemplate({ result, t }: FollowUpEmailTemplateProps)
               onChange={(e) => void handleLanguageChange(e.target.value)}
               className="min-h-10 rounded-xl border border-white/15 bg-white/5 px-3 text-sm font-medium text-white outline-none ring-brand-500 focus:ring-2 disabled:opacity-60"
             >
-              {EMAIL_RECIPIENT_LANGUAGES.map((lang) => (
-                <option key={lang.id} value={lang.id} className="text-slate-900">
-                  {lang.flag} {lang.name}
-                </option>
-              ))}
+              <optgroup label={t.email.europeGroup} className="text-slate-900">
+                {EMAIL_RECIPIENT_LANGUAGES.filter((lang) => lang.region === "europe").map((lang) => (
+                  <option key={lang.id} value={lang.id} className="text-slate-900">
+                    {lang.flag} {recipientLanguageLabel(lang)}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label={t.email.globalGroup} className="text-slate-900">
+                {EMAIL_RECIPIENT_LANGUAGES.filter((lang) => lang.region === "global").map((lang) => (
+                  <option key={lang.id} value={lang.id} className="text-slate-900">
+                    {lang.flag} {recipientLanguageLabel(lang)}
+                  </option>
+                ))}
+              </optgroup>
             </select>
           </label>
           <button

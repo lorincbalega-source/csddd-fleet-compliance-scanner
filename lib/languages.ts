@@ -5,6 +5,7 @@ export interface TradeLanguage {
   name: string;
   nativeName: string;
   flag: string;
+  countryCode: string;
   region: LanguageRegion;
   searchTerms: string;
 }
@@ -15,6 +16,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "English",
     nativeName: "English",
     flag: "🇬🇧",
+    countryCode: "GB",
     region: "europe",
     searchTerms: "english en gb uk britain",
   },
@@ -23,6 +25,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "German",
     nativeName: "Deutsch",
     flag: "🇩🇪",
+    countryCode: "DE",
     region: "europe",
     searchTerms: "german deutsch de germany",
   },
@@ -31,6 +34,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Hungarian",
     nativeName: "Magyar",
     flag: "🇭🇺",
+    countryCode: "HU",
     region: "europe",
     searchTerms: "hungarian magyar hu hungary",
   },
@@ -39,6 +43,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Polish",
     nativeName: "Polski",
     flag: "🇵🇱",
+    countryCode: "PL",
     region: "europe",
     searchTerms: "polish polski pl poland",
   },
@@ -47,6 +52,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Romanian",
     nativeName: "Română",
     flag: "🇷🇴",
+    countryCode: "RO",
     region: "europe",
     searchTerms: "romanian romana ro romania",
   },
@@ -55,6 +61,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "French",
     nativeName: "Français",
     flag: "🇫🇷",
+    countryCode: "FR",
     region: "europe",
     searchTerms: "french francais fr france",
   },
@@ -63,6 +70,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Italian",
     nativeName: "Italiano",
     flag: "🇮🇹",
+    countryCode: "IT",
     region: "europe",
     searchTerms: "italian italiano it italy",
   },
@@ -71,6 +79,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Dutch",
     nativeName: "Nederlands",
     flag: "🇳🇱",
+    countryCode: "NL",
     region: "europe",
     searchTerms: "dutch nederlands nl netherlands holland",
   },
@@ -79,6 +88,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Spanish",
     nativeName: "Español",
     flag: "🇪🇸",
+    countryCode: "ES",
     region: "europe",
     searchTerms: "spanish espanol es spain",
   },
@@ -87,6 +97,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Czech",
     nativeName: "Čeština",
     flag: "🇨🇿",
+    countryCode: "CZ",
     region: "europe",
     searchTerms: "czech cestina cs czechia",
   },
@@ -95,6 +106,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Slovak",
     nativeName: "Slovenčina",
     flag: "🇸🇰",
+    countryCode: "SK",
     region: "europe",
     searchTerms: "slovak slovencina sk slovakia",
   },
@@ -103,6 +115,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Bulgarian",
     nativeName: "Български",
     flag: "🇧🇬",
+    countryCode: "BG",
     region: "europe",
     searchTerms: "bulgarian bg bulgaria",
   },
@@ -111,6 +124,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Serbian",
     nativeName: "Srpski",
     flag: "🇷🇸",
+    countryCode: "RS",
     region: "europe",
     searchTerms: "serbian srpski sr serbia",
   },
@@ -119,6 +133,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Ukrainian",
     nativeName: "Українська",
     flag: "🇺🇦",
+    countryCode: "UA",
     region: "europe",
     searchTerms: "ukrainian uk ukraine",
   },
@@ -127,6 +142,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Swedish",
     nativeName: "Svenska",
     flag: "🇸🇪",
+    countryCode: "SE",
     region: "europe",
     searchTerms: "swedish svenska sv sweden",
   },
@@ -135,6 +151,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Danish",
     nativeName: "Dansk",
     flag: "🇩🇰",
+    countryCode: "DK",
     region: "europe",
     searchTerms: "danish dansk da denmark",
   },
@@ -143,6 +160,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Chinese (Mandarin)",
     nativeName: "中文",
     flag: "🇨🇳",
+    countryCode: "CN",
     region: "global",
     searchTerms: "chinese mandarin zh cn china putonghua",
   },
@@ -151,6 +169,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Japanese",
     nativeName: "日本語",
     flag: "🇯🇵",
+    countryCode: "JP",
     region: "global",
     searchTerms: "japanese ja jp japan",
   },
@@ -159,6 +178,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Korean",
     nativeName: "한국어",
     flag: "🇰🇷",
+    countryCode: "KR",
     region: "global",
     searchTerms: "korean ko kr korea",
   },
@@ -167,6 +187,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Vietnamese",
     nativeName: "Tiếng Việt",
     flag: "🇻🇳",
+    countryCode: "VN",
     region: "global",
     searchTerms: "vietnamese vi vn vietnam",
   },
@@ -175,6 +196,7 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Turkish",
     nativeName: "Türkçe",
     flag: "🇹🇷",
+    countryCode: "TR",
     region: "global",
     searchTerms: "turkish turkce tr turkey",
   },
@@ -183,38 +205,33 @@ export const TRADE_LANGUAGES: TradeLanguage[] = [
     name: "Arabic",
     nativeName: "العربية",
     flag: "🇸🇦",
+    countryCode: "SA",
     region: "global",
     searchTerms: "arabic ar gulf mena",
   },
 ];
 
-export const EMAIL_RECIPIENT_LANGUAGE_IDS = ["de", "ro", "pl", "hu", "en"] as const;
+export const EMAIL_RECIPIENT_LANGUAGE_IDS = TRADE_LANGUAGES.map((lang) => lang.id);
 
-export type EmailRecipientLanguageId = (typeof EMAIL_RECIPIENT_LANGUAGE_IDS)[number];
+export const EMAIL_RECIPIENT_LANGUAGES = TRADE_LANGUAGES;
 
-export const EMAIL_RECIPIENT_LANGUAGES: TradeLanguage[] = EMAIL_RECIPIENT_LANGUAGE_IDS.map(
-  (id) => TRADE_LANGUAGES.find((lang) => lang.id === id)!,
-);
-
-export function isEmailRecipientLanguageId(value: string): value is EmailRecipientLanguageId {
-  return (EMAIL_RECIPIENT_LANGUAGE_IDS as readonly string[]).includes(value);
+export function recipientLanguageLabel(lang: TradeLanguage): string {
+  const base = lang.id === "zh" ? "Chinese" : lang.name;
+  return `${base} (${lang.countryCode})`;
 }
 
 export function resolveRecipientLanguage(id: string | null | undefined): TradeLanguage {
-  const english = EMAIL_RECIPIENT_LANGUAGES.find((lang) => lang.id === "en")!;
+  const english = TRADE_LANGUAGES.find((lang) => lang.id === "en")!;
   if (!id) return english;
   const q = id.trim().toLowerCase();
   return (
-    EMAIL_RECIPIENT_LANGUAGES.find(
-      (lang) => lang.id === q || lang.name.toLowerCase() === q || lang.nativeName.toLowerCase() === q,
+    TRADE_LANGUAGES.find(
+      (lang) =>
+        lang.id === q ||
+        lang.name.toLowerCase() === q ||
+        lang.nativeName.toLowerCase() === q ||
+        lang.countryCode.toLowerCase() === q,
     ) ?? english
   );
 }
 
-export function filterTradeLanguages(query: string): TradeLanguage[] {
-  const q = query.trim().toLowerCase();
-  if (!q) return TRADE_LANGUAGES;
-  return TRADE_LANGUAGES.filter((lang) =>
-    `${lang.name} ${lang.nativeName} ${lang.searchTerms}`.toLowerCase().includes(q),
-  );
-}
