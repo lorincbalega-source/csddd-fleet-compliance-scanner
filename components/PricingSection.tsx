@@ -11,7 +11,6 @@ export function PricingSection({ t }: PricingSectionProps) {
     {
       name: t.pricing.starterName,
       price: t.pricing.starterPrice,
-      period: true,
       audits: t.pricing.starterAudits,
       cta: t.pricing.starterCta,
       href: "#audit",
@@ -19,29 +18,22 @@ export function PricingSection({ t }: PricingSectionProps) {
       features: [t.pricing.starterF1, t.pricing.starterF2, t.pricing.starterF3, t.pricing.starterF4],
     },
     {
+      name: t.pricing.growthName,
+      price: t.pricing.growthPrice,
+      audits: t.pricing.growthAudits,
+      cta: t.pricing.growthCta,
+      href: "#audit",
+      featured: true,
+      features: [t.pricing.growthF1, t.pricing.growthF2, t.pricing.growthF3, t.pricing.growthF4],
+    },
+    {
       name: t.pricing.proName,
       price: t.pricing.proPrice,
-      period: true,
       audits: t.pricing.proAudits,
       cta: t.pricing.proCta,
       href: "#audit",
-      featured: true,
-      features: [t.pricing.proF1, t.pricing.proF2, t.pricing.proF3, t.pricing.proF4],
-    },
-    {
-      name: t.pricing.enterpriseName,
-      price: t.pricing.enterprisePrice,
-      period: false,
-      audits: t.pricing.enterpriseAudits,
-      cta: t.pricing.enterpriseCta,
-      href: "mailto:sales@dockify.ai?subject=Dockify%20Enterprise",
       featured: false,
-      features: [
-        t.pricing.enterpriseF1,
-        t.pricing.enterpriseF2,
-        t.pricing.enterpriseF3,
-        t.pricing.enterpriseF4,
-      ],
+      features: [t.pricing.proF1, t.pricing.proF2, t.pricing.proF3, t.pricing.proF4],
     },
   ];
 
@@ -77,9 +69,7 @@ export function PricingSection({ t }: PricingSectionProps) {
               </div>
               <p className="mt-4 flex items-baseline gap-1">
                 <span className="text-4xl font-semibold tracking-tight">{plan.price}</span>
-                {plan.period && (
-                  <span className="text-sm font-medium text-slate-500">{t.pricing.perMonth}</span>
-                )}
+                <span className="text-sm font-medium text-slate-500">{t.pricing.perMonth}</span>
               </p>
               <p className="mt-1 text-sm text-slate-400">{plan.audits}</p>
               <ul className="mt-6 flex-1 space-y-2.5 text-sm text-slate-300">

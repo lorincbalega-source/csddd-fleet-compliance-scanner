@@ -25,6 +25,9 @@ export function DashboardHeader({ t }: DashboardHeaderProps) {
           <a href="#features" className="transition-colors hover:text-white">
             {t.nav.features}
           </a>
+          <a href="#languages" className="transition-colors hover:text-white">
+            {t.nav.languages}
+          </a>
           <a href="#pricing" className="transition-colors hover:text-white">
             {t.nav.pricing}
           </a>

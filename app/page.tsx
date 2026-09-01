@@ -7,6 +7,7 @@ import type { AuditResult } from "@/lib/types";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { HeroSection } from "@/components/HeroSection";
 import { ValueProposition } from "@/components/ValueProposition";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { FileUploadZone } from "@/components/FileUploadZone";
 import { AuditReport } from "@/components/AuditReport";
 import { PricingSection } from "@/components/PricingSection";
@@ -73,8 +74,11 @@ export default function DashboardPage() {
 
       <main id="product" className="scroll-mt-20 border-b border-slate-200 bg-slate-50">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16">
-          <div id="audit" className="scroll-mt-24">
-            <FileUploadZone t={t} isLoading={isLoading} onAudit={handleAudit} />
+          <div className="space-y-6">
+            <LanguageSelector t={t} />
+            <div id="audit" className="scroll-mt-24">
+              <FileUploadZone t={t} isLoading={isLoading} onAudit={handleAudit} />
+            </div>
           </div>
 
           {apiError && (
