@@ -27,7 +27,7 @@ export function HeroSection({ t }: HeroSectionProps) {
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <a
-              href="#audit"
+              href="/inbox"
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-600 px-6 text-sm font-semibold text-white shadow-lg shadow-brand-900/40 transition hover:bg-brand-500"
             >
               {t.landing.ctaPrimary}

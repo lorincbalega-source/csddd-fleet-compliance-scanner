@@ -54,3 +54,42 @@ export interface AuditResult {
   analyzedAt: string;
   sourceFile?: string;
 }
+
+export type ReviewStatus = "pending" | "approved" | "skipped";
+export type DocumentFileKind = "pdf" | "image" | "mock";
+
+export interface DocumentPage {
+  id: string;
+  label: string;
+  kind: DocumentFileKind;
+  src?: string;
+  mockVariant?: "cmr" | "pod" | "invoice";
+}
+
+export interface DocumentEntity {
+  id: string;
+  recipientName: string;
+  recipientEmail: string;
+  fileName: string;
+  fileKind: DocumentFileKind;
+  fileUrl?: string;
+  pages: DocumentPage[];
+  audit: AuditResult;
+  reviewStatus: ReviewStatus;
+}
+
+export interface SendEmailPayload {
+  entityId: string;
+  recipientEmail: string;
+  recipientName: string;
+  language: string;
+  subject: string;
+  body: string;
+}
+
+export interface SaveAuditStatusPayload {
+  entityId: string;
+  status: ReviewStatus;
+  language: string;
+  shipmentReference: string;
+}

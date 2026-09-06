@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FileSearch } from "lucide-react";
 import { getTranslations } from "@/lib/translations";
 import type { AuditResult } from "@/lib/types";
@@ -11,9 +12,12 @@ import { FileUploadZone } from "@/components/FileUploadZone";
 import { AuditReport } from "@/components/AuditReport";
 import { PricingSection } from "@/components/PricingSection";
 import { SiteFooter } from "@/components/SiteFooter";
+import { cloneSampleQueue, auditResultToEntity } from "@/lib/document-entities";
+import { setInboxQueue } from "@/lib/inbox-store";
 
 export default function DashboardPage() {
   const t = getTranslations("en");
+  const router = useRouter();
   const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -26,11 +30,9 @@ export default function DashboardPage() {
       let response: Response;
 
       if (useMock) {
-        response = await fetch("/api/audit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ useMock: true }),
-        });
+        setInboxQueue(cloneSampleQueue());
+        router.push("/inbox");
+        return;
       } else if (file) {
         const formData = new FormData();
         formData.append("file", file);
@@ -57,7 +59,10 @@ export default function DashboardPage() {
         return;
       }
 
-      setAuditResult(data as AuditResult);
+      const result = data as AuditResult;
+      setAuditResult(result);
+      setInboxQueue([auditResultToEntity(result, file)]);
+      router.push("/inbox");
     } catch {
       setApiError(t.errors.auditFailed);
     } finally {

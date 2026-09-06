@@ -19,6 +19,9 @@ export function DashboardHeader({ t }: DashboardHeaderProps) {
         </a>
 
         <nav className="hidden items-center gap-8 text-sm font-medium text-slate-300 md:flex">
+          <a href="/inbox" className="transition-colors hover:text-white">
+            {t.nav.inbox}
+          </a>
           <a href="#product" className="transition-colors hover:text-white">
             {t.nav.product}
           </a>
