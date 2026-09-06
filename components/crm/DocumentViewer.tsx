@@ -1,6 +1,5 @@
 "use client";
 
-import { FileText } from "lucide-react";
 import type { DocumentEntity, DocumentPage } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -12,17 +11,7 @@ export function DocumentViewer({ entity }: DocumentViewerProps) {
   const pdfSrc = entity.fileKind === "pdf" ? entity.fileUrl ?? entity.pages[0]?.src : undefined;
 
   return (
-    <aside className="flex h-full min-h-0 flex-col border-r border-slate-200 bg-slate-200/70">
-      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-2.5">
-        <div className="flex min-w-0 items-center gap-2">
-          <FileText className="h-4 w-4 shrink-0 text-brand-600" />
-          <p className="truncate text-sm font-semibold text-slate-900">{entity.fileName}</p>
-        </div>
-        <p className="shrink-0 text-xs font-medium text-slate-500">
-          {entity.pages.length} {entity.pages.length === 1 ? "page" : "pages"}
-        </p>
-      </div>
-
+    <aside className="flex h-full min-h-0 flex-col bg-slate-200/70">
       <div
         className="document-viewer-scroll min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4 py-4"
         onWheelCapture={stopEntitySlide}

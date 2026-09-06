@@ -182,6 +182,8 @@ const translations = {
       backHome: "Back to dashboard",
       waitingFirst: "Analyzing document…",
       waitingNextReady: "Waiting for the next ready document…",
+      tabAudit: "Audit Data",
+      tabEmail: "Follow-Up Email",
       statusOk: "OK",
       statusDiscrepancy: "Discrepancy found",
       statusProcessing: "Processing",

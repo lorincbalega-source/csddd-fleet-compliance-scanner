@@ -25,19 +25,14 @@ export function SlideAuditPanel({ entity, t }: SlideAuditPanelProps) {
   ] as const;
 
   return (
-    <section className="flex min-h-0 flex-1 flex-col overflow-hidden border-b border-slate-200 bg-white">
-      <div className="flex shrink-0 items-start justify-between gap-3 px-4 py-3">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-            {t.crm.auditResults}
-          </p>
-          <h2 className="mt-0.5 text-sm font-semibold text-slate-900">{t.crm.extractedFields}</h2>
-        </div>
+    <section className="flex h-full min-h-0 flex-col overflow-hidden bg-white">
+      <div className="flex shrink-0 items-center justify-between gap-3 px-4 pb-2 pt-3">
+        <h2 className="text-sm font-semibold text-slate-900">{t.crm.extractedFields}</h2>
         <StatusBadge status={doc.riskLevel} label={getRiskLabel(doc.riskLevel, t)} size="md" />
       </div>
 
       <div
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4"
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-24"
         onWheelCapture={(event) => event.stopPropagation()}
       >
         <div className="grid grid-cols-2 gap-2">

@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Check, ChevronRight, Loader2, ShieldCheck } from "lucide-react";
 import { DocumentSlide } from "@/components/crm/DocumentSlide";
-import { QueueThumbnailBar } from "@/components/crm/QueueThumbnailBar";
 import type { DocumentEntity, FollowUpEmail } from "@/lib/types";
 import type { Translations } from "@/lib/translations";
 import { composeFollowUpEmail } from "@/lib/email-templates";
@@ -190,30 +189,40 @@ export function DocumentSlideDeck({ initialQueue, t }: DocumentSlideDeckProps) {
     );
   }
 
+  const done = queue.filter(
+    (item) =>
+      item.processingStatus === "ready" ||
+      item.processingStatus === "failed" ||
+      item.reviewStatus === "approved",
+  ).length;
+  const stillWorking = queue.some(
+    (item) => item.processingStatus === "queued" || item.processingStatus === "processing",
+  );
+  const headerProgress = stillWorking
+    ? t.crm.processingProgress.replace("{current}", String(done)).replace("{total}", String(queue.length))
+    : t.crm.progress.replace("{current}", String(index + 1)).replace("{total}", String(queue.length));
+
   return (
-    <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-slate-100">
-      <header className="z-20 shrink-0 border-b border-slate-800 bg-slate-950">
-        <div className="flex items-center justify-between gap-3 px-4 py-2.5">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white">
-              <ShieldCheck className="h-4 w-4" />
-            </div>
-            <span className="text-sm font-semibold text-white">{t.app.name}</span>
-          </Link>
-          <p className="hidden text-xs text-slate-500 sm:block">{t.crm.enterHint}</p>
-        </div>
-        <QueueThumbnailBar
-          queue={queue}
-          activeId={entity?.id}
-          t={t}
-          onSelect={(id) => {
-            const next = queue.findIndex((item) => item.id === id);
-            if (next >= 0) {
-              setWaitingForNext(false);
-              setIndex(next);
-            }
-          }}
-        />
+    <div className="relative flex h-[100vh] max-h-[100vh] flex-col overflow-hidden bg-slate-100">
+      <header className="z-20 flex h-12 shrink-0 items-center gap-3 border-b border-slate-800 bg-slate-950 px-3">
+        <Link href="/" className="flex shrink-0 items-center gap-2">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-600 text-white">
+            <ShieldCheck className="h-3.5 w-3.5" />
+          </div>
+          <span className="text-sm font-semibold text-white">{t.app.name}</span>
+        </Link>
+        <p className="min-w-0 flex-1 truncate text-xs font-medium text-slate-300">
+          {entity?.audit?.document.shipmentReference ?? entity?.fileName ?? ""}
+          {entity?.originFileName && entity.originFileName !== entity.fileName
+            ? ` · ${entity.originFileName}`
+            : ""}
+        </p>
+        <p className="shrink-0 text-xs font-medium text-slate-400">{headerProgress}</p>
+        {error && (
+          <p className="hidden max-w-[220px] truncate text-xs text-red-400 lg:block" role="alert">
+            {error}
+          </p>
+        )}
       </header>
 
       <div
@@ -255,49 +264,43 @@ export function DocumentSlideDeck({ initialQueue, t }: DocumentSlideDeckProps) {
             </div>
           );
         })}
-      </div>
 
-      <footer className="z-20 flex shrink-0 items-center justify-between gap-3 border-t border-slate-200 bg-white px-4 py-3">
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-slate-900">
-            {entity?.audit?.document.shipmentReference ?? entity?.fileName ?? "—"}
-          </p>
-          <p className="truncate text-xs text-slate-500">
-            {waitingForNext ? t.crm.waitingNextReady : `${entity?.recipientName ?? "—"} · ${entity?.recipientEmail ?? ""}`}
-          </p>
-          {error && (
-            <p className="mt-1 text-xs text-red-600" role="alert">
-              {error}
-            </p>
-          )}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-end p-3">
+          <div className="pointer-events-auto flex max-w-[420px] flex-col items-end gap-1">
+            {waitingForNext && (
+              <p className="rounded-lg bg-white/90 px-2 py-1 text-[11px] font-medium text-slate-600 shadow-sm">
+                {t.crm.waitingNextReady}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={() => void approveAndNext()}
+              disabled={!canApprove || isSubmitting}
+              className={cn(
+                "inline-flex h-11 items-center gap-2 rounded-xl px-5 text-sm font-semibold text-white shadow-lg shadow-slate-900/20",
+                !canApprove || isSubmitting ? "bg-brand-400" : "bg-brand-600 hover:bg-brand-500",
+              )}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  {t.crm.sending}
+                </>
+              ) : waitingForNext ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  {t.crm.waitingNextReady}
+                </>
+              ) : (
+                <>
+                  {t.crm.approveSendNext}
+                  <ChevronRight className="h-4 w-4" />
+                </>
+              )}
+            </button>
+          </div>
         </div>
-        <button
-          type="button"
-          onClick={() => void approveAndNext()}
-          disabled={!canApprove || isSubmitting}
-          className={cn(
-            "inline-flex min-h-11 items-center gap-2 rounded-xl px-5 text-sm font-semibold text-white shadow-sm",
-            !canApprove || isSubmitting ? "bg-brand-400" : "bg-brand-600 hover:bg-brand-500",
-          )}
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              {t.crm.sending}
-            </>
-          ) : waitingForNext ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              {t.crm.waitingNextReady}
-            </>
-          ) : (
-            <>
-              {t.crm.approveSendNext}
-              <ChevronRight className="h-4 w-4" />
-            </>
-          )}
-        </button>
-      </footer>
+      </div>
 
       {complete && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-slate-950/70 p-6">

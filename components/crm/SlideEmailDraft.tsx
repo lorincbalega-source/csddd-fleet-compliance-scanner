@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Mail } from "lucide-react";
 import type { DocumentEntity, FollowUpEmail } from "@/lib/types";
 import type { Translations } from "@/lib/translations";
 import {
@@ -97,34 +96,26 @@ export function SlideEmailDraft({
   };
 
   return (
-    <section className="flex min-h-0 flex-[1.15] flex-col overflow-hidden bg-slate-950">
-      <div className="flex shrink-0 items-start justify-between gap-3 px-4 py-3">
-        <div className="flex items-start gap-2">
-          <div className="mt-0.5 flex h-7 w-7 items-center justify-center rounded-lg bg-brand-600 text-white">
-            <Mail className="h-3.5 w-3.5" />
-          </div>
-          <div>
-            <h2 className="text-sm font-semibold text-white">{t.email.title}</h2>
-            <p className="text-[11px] text-slate-400">{t.crm.emailHint}</p>
-          </div>
-        </div>
-        <label className="min-w-[168px]">
+    <section className="flex h-full min-h-0 flex-col overflow-hidden bg-white">
+      <div className="flex shrink-0 items-center justify-between gap-2 px-4 pb-2 pt-3">
+        <p className="text-[11px] text-slate-500">{t.crm.emailHint}</p>
+        <label className="min-w-[148px]">
           <span className="sr-only">{t.email.recipientLanguage}</span>
-            <select
-              value={language}
-              onChange={(event) => void handleLanguageChange(event.target.value)}
-              className="h-9 w-full rounded-lg border border-white/15 bg-white/5 px-2 text-xs font-medium text-white outline-none ring-brand-500 focus:ring-2"
-            >
-            <optgroup label={t.email.europeGroup} className="text-slate-900">
+          <select
+            value={language}
+            onChange={(event) => void handleLanguageChange(event.target.value)}
+            className="h-8 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-xs font-medium text-slate-800 outline-none ring-brand-500 focus:ring-2"
+          >
+            <optgroup label={t.email.europeGroup}>
               {europe.map((lang) => (
-                <option key={lang.id} value={lang.id} className="text-slate-900">
+                <option key={lang.id} value={lang.id}>
                   {lang.flag} {recipientLanguageLabel(lang)}
                 </option>
               ))}
             </optgroup>
-            <optgroup label={t.email.globalGroup} className="text-slate-900">
+            <optgroup label={t.email.globalGroup}>
               {global.map((lang) => (
-                <option key={lang.id} value={lang.id} className="text-slate-900">
+                <option key={lang.id} value={lang.id}>
                   {lang.flag} {recipientLanguageLabel(lang)}
                 </option>
               ))}
@@ -134,36 +125,35 @@ export function SlideEmailDraft({
       </div>
 
       <div
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4"
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-24"
         onWheelCapture={(event) => event.stopPropagation()}
       >
         {error && (
-          <p className="mb-2 rounded-lg bg-red-500/15 px-3 py-2 text-xs text-red-200" role="alert">
+          <p className="mb-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700" role="alert">
             {error}
           </p>
         )}
-        <div className="space-y-2">
-            <label className="block">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                {t.email.subject}
-              </span>
-              <input
-                value={email.subject}
-                onChange={(event) => onEmailChange({ ...email, subject: event.target.value })}
-                className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-white outline-none ring-brand-500 focus:ring-2"
-              />
-            </label>
-            <label className="block">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                {t.email.body}
-              </span>
-              <textarea
-                value={email.body}
-                onChange={(event) => onEmailChange({ ...email, body: event.target.value })}
-                rows={10}
-                className="mt-1 w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-sans text-sm leading-relaxed text-slate-100 outline-none ring-brand-500 focus:ring-2"
-              />
-            </label>
+        <div className="space-y-3">
+          <label className="block">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+              {t.email.subject}
+            </span>
+            <input
+              value={email.subject}
+              onChange={(event) => onEmailChange({ ...email, subject: event.target.value })}
+              className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-900 outline-none ring-brand-500 focus:ring-2"
+            />
+          </label>
+          <label className="block h-[calc(100%-4rem)]">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+              {t.email.body}
+            </span>
+            <textarea
+              value={email.body}
+              onChange={(event) => onEmailChange({ ...email, body: event.target.value })}
+              className="mt-1 min-h-[280px] w-full resize-none rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-sans text-sm leading-relaxed text-slate-800 outline-none ring-brand-500 focus:ring-2"
+            />
+          </label>
         </div>
       </div>
     </section>
