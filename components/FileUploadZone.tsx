@@ -12,79 +12,75 @@ import {
 } from "lucide-react";
 import type { Translations } from "@/lib/translations";
 import { cn } from "@/lib/utils";
+import { isAcceptedUpload } from "@/lib/bulk-upload";
 
 interface FileUploadZoneProps {
   t: Translations;
   isLoading: boolean;
-  onAudit: (file: File | null, useMock: boolean) => void;
+  onAudit: (files: File[], useMock: boolean) => void;
 }
 
 export function FileUploadZone({ t, isLoading, onAudit }: FileUploadZoneProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
 
-  const validateFile = useCallback(
-    (file: File): boolean => {
-      const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
-      const isImage =
-        file.type.startsWith("image/") ||
-        [".jpg", ".jpeg", ".png", ".webp", ".heic", ".gif"].includes(ext);
-      const isPdf = file.type === "application/pdf" || ext === ".pdf";
-      const isDocx =
-        file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-        ext === ".docx";
-      if (!isImage && !isPdf && !isDocx) {
+  const addFiles = useCallback(
+    (incoming: FileList | File[]) => {
+      const next = Array.from(incoming);
+      const valid: File[] = [];
+      let rejected = false;
+      for (const file of next) {
+        if (isAcceptedUpload(file)) {
+          valid.push(file);
+        } else {
+          rejected = true;
+        }
+      }
+      if (rejected && valid.length === 0) {
         setError(t.errors.invalidFileType);
-        return false;
+        return;
       }
-      if (file.size > 10 * 1024 * 1024) {
-        setError(t.errors.fileTooLarge);
-        return false;
-      }
-      setError(null);
-      return true;
+      setError(rejected ? t.errors.invalidFileType : null);
+      setSelectedFiles((prev) => {
+        const names = new Set(prev.map((file) => `${file.name}:${file.size}`));
+        const merged = [...prev];
+        for (const file of valid) {
+          const key = `${file.name}:${file.size}`;
+          if (!names.has(key)) {
+            names.add(key);
+            merged.push(file);
+          }
+        }
+        return merged;
+      });
     },
     [t],
-  );
-
-  const handleFile = useCallback(
-    (file: File) => {
-      if (validateFile(file)) {
-        setSelectedFile(file);
-      }
-    },
-    [validateFile],
   );
 
   const onDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragging(false);
-      const file = e.dataTransfer.files[0];
-      if (file) handleFile(file);
+      if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
     },
-    [handleFile],
+    [addFiles],
   );
 
-  const onBrowse = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleFile(file);
-  };
-
   const handleRunAudit = () => {
-    if (!selectedFile) {
+    if (!selectedFiles.length) {
       setError(t.errors.noFile);
       return;
     }
-    onAudit(selectedFile, false);
+    onAudit(selectedFiles, false);
   };
 
   const handleLoadSample = () => {
-    setSelectedFile(null);
+    setSelectedFiles([]);
     setError(null);
-    onAudit(null, true);
+    onAudit([], true);
   };
 
   return (
@@ -117,9 +113,23 @@ export function FileUploadZone({ t, isLoading, onAudit }: FileUploadZoneProps) {
             ref={inputRef}
             type="file"
             accept="image/*,application/pdf"
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files?.length) addFiles(e.target.files);
+              e.target.value = "";
+            }}
+          />
+          <input
+            ref={cameraRef}
+            type="file"
+            accept="image/*"
             capture="environment"
             className="hidden"
-            onChange={onBrowse}
+            onChange={(e) => {
+              if (e.target.files?.length) addFiles(e.target.files);
+              e.target.value = "";
+            }}
           />
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-950 text-brand-400 shadow-sm">
             <Upload className="h-6 w-6" />
@@ -143,7 +153,7 @@ export function FileUploadZone({ t, isLoading, onAudit }: FileUploadZoneProps) {
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                inputRef.current?.click();
+                cameraRef.current?.click();
               }}
               className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-brand-700"
             >
@@ -153,28 +163,40 @@ export function FileUploadZone({ t, isLoading, onAudit }: FileUploadZoneProps) {
           </div>
         </div>
 
-        {selectedFile && (
-          <div className="mt-4 flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-brand-600 ring-1 ring-slate-200">
-                <FileText className="h-4 w-4" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-slate-800">{selectedFile.name}</p>
-                <p className="text-xs text-slate-400">{(selectedFile.size / 1024).toFixed(1)} KB</p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedFile(null);
-                setError(null);
-              }}
-              className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
-              aria-label={t.upload.removeFile}
-            >
-              <X className="h-4 w-4" />
-            </button>
+        {selectedFiles.length > 0 && (
+          <div className="mt-4 space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              {t.upload.selectedCount.replace("{count}", String(selectedFiles.length))}
+            </p>
+            <ul className="max-h-48 space-y-2 overflow-y-auto">
+              {selectedFiles.map((file, index) => (
+                <li
+                  key={`${file.name}-${file.size}-${index}`}
+                  className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-brand-600 ring-1 ring-slate-200">
+                      <FileText className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-slate-800">{file.name}</p>
+                      <p className="text-xs text-slate-400">{(file.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedFiles((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
+                      setError(null);
+                    }}
+                    className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
+                    aria-label={t.upload.removeFile}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 

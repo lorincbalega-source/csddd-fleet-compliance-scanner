@@ -240,6 +240,7 @@ export const SAMPLE_DOCUMENT_QUEUE: DocumentEntity[] = [
     pages: makeMockPages("cmr-88421", 4, "cmr"),
     audit: cmrAudit,
     reviewStatus: "pending",
+    processingStatus: "ready",
   },
   {
     id: "doc-pod-88421",
@@ -250,6 +251,7 @@ export const SAMPLE_DOCUMENT_QUEUE: DocumentEntity[] = [
     pages: makeMockPages("pod-88421", 3, "pod"),
     audit: podAudit,
     reviewStatus: "pending",
+    processingStatus: "ready",
   },
   {
     id: "doc-inv-1102",
@@ -260,6 +262,7 @@ export const SAMPLE_DOCUMENT_QUEUE: DocumentEntity[] = [
     pages: makeMockPages("inv-1102", 3, "invoice"),
     audit: invoiceAudit,
     reviewStatus: "pending",
+    processingStatus: "ready",
   },
   {
     id: "doc-cmr-4410",
@@ -270,6 +273,7 @@ export const SAMPLE_DOCUMENT_QUEUE: DocumentEntity[] = [
     pages: makeMockPages("cmr-4410", 2, "cmr"),
     audit: compliantAudit,
     reviewStatus: "pending",
+    processingStatus: "ready",
   },
   {
     id: "doc-pod-772",
@@ -280,6 +284,7 @@ export const SAMPLE_DOCUMENT_QUEUE: DocumentEntity[] = [
     pages: makeMockPages("pod-772", 3, "pod"),
     audit: photoPodAudit,
     reviewStatus: "pending",
+    processingStatus: "ready",
   },
 ];
 
@@ -287,8 +292,11 @@ export function cloneSampleQueue(): DocumentEntity[] {
   return SAMPLE_DOCUMENT_QUEUE.map((entity) => ({
     ...entity,
     pages: entity.pages.map((page) => ({ ...page })),
-    audit: { ...entity.audit, document: { ...entity.audit.document } },
+    audit: entity.audit
+      ? { ...entity.audit, document: { ...entity.audit.document } }
+      : null,
     reviewStatus: "pending",
+    processingStatus: "ready" as const,
   }));
 }
 
@@ -317,6 +325,7 @@ export function auditResultToEntity(
     pages: previewPages,
     audit,
     reviewStatus: "pending",
+    processingStatus: "ready",
   };
 }
 

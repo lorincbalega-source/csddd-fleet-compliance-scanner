@@ -65,7 +65,7 @@ function MockPaperPage({
   index: number;
   entity: DocumentEntity;
 }) {
-  const doc = entity.audit.document;
+  const doc = entity.audit?.document;
   const variant = page.mockVariant ?? "cmr";
 
   if (page.kind === "image" && page.src) {
@@ -76,6 +76,14 @@ function MockPaperPage({
           {page.label}
         </figcaption>
       </figure>
+    );
+  }
+
+  if (!doc) {
+    return (
+      <article className="relative min-h-[420px] bg-white px-8 py-7 shadow-[0_12px_40px_rgba(15,23,42,0.18)] ring-1 ring-slate-300">
+        <p className="text-sm font-medium text-slate-500">Analyzing page…</p>
+      </article>
     );
   }
 
@@ -114,7 +122,8 @@ function Field({ label, value, warn }: { label: string; value: string; warn?: bo
 }
 
 function CmrBody({ index, entity }: { index: number; entity: DocumentEntity }) {
-  const doc = entity.audit.document;
+  const doc = entity.audit?.document;
+  if (!doc) return null;
   if (index === 0) {
     return (
       <div className="grid grid-cols-2 gap-2">
@@ -160,7 +169,8 @@ function CmrBody({ index, entity }: { index: number; entity: DocumentEntity }) {
 }
 
 function PodBody({ index, entity }: { index: number; entity: DocumentEntity }) {
-  const doc = entity.audit.document;
+  const doc = entity.audit?.document;
+  if (!doc) return null;
   if (index === 0) {
     return (
       <div className="grid grid-cols-2 gap-2">
@@ -196,7 +206,8 @@ function PodBody({ index, entity }: { index: number; entity: DocumentEntity }) {
 }
 
 function InvoiceBody({ index, entity }: { index: number; entity: DocumentEntity }) {
-  const doc = entity.audit.document;
+  const doc = entity.audit?.document;
+  if (!doc) return null;
   if (index === 0) {
     return (
       <div className="space-y-3">

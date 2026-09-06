@@ -4,64 +4,44 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FileSearch } from "lucide-react";
 import { getTranslations } from "@/lib/translations";
-import type { AuditResult } from "@/lib/types";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { HeroSection } from "@/components/HeroSection";
 import { ValueProposition } from "@/components/ValueProposition";
 import { FileUploadZone } from "@/components/FileUploadZone";
-import { AuditReport } from "@/components/AuditReport";
 import { PricingSection } from "@/components/PricingSection";
 import { SiteFooter } from "@/components/SiteFooter";
-import { cloneSampleQueue, auditResultToEntity } from "@/lib/document-entities";
+import { cloneSampleQueue } from "@/lib/document-entities";
 import { setInboxQueue } from "@/lib/inbox-store";
+import { prepareBulkInbox } from "@/lib/bulk-upload";
 
 export default function DashboardPage() {
   const t = getTranslations("en");
   const router = useRouter();
-  const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
-  const handleAudit = async (file: File | null, useMock: boolean) => {
+  const handleAudit = async (files: File[], useMock: boolean) => {
     setIsLoading(true);
     setApiError(null);
 
     try {
-      let response: Response;
-
       if (useMock) {
         setInboxQueue(cloneSampleQueue());
         router.push("/inbox");
         return;
-      } else if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        response = await fetch("/api/audit", {
-          method: "POST",
-          body: formData,
-        });
-      } else {
+      }
+
+      if (!files.length) {
         setApiError(t.errors.noFile);
         return;
       }
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        const errorMap: Record<string, string> = {
-          NO_FILE: t.errors.noFile,
-          INVALID_FILE_TYPE: t.errors.invalidFileType,
-          FILE_TOO_LARGE: t.errors.fileTooLarge,
-          OPENAI_AUDIT_FAILED: t.errors.openaiFailed,
-          OPENAI_API_KEY_MISSING: t.errors.openaiKeyMissing,
-        };
-        setApiError(errorMap[data.error] ?? t.errors.auditFailed);
+      const entities = await prepareBulkInbox(files);
+      if (!entities.length) {
+        setApiError(t.errors.noFile);
         return;
       }
 
-      const result = data as AuditResult;
-      setAuditResult(result);
-      setInboxQueue([auditResultToEntity(result, file)]);
       router.push("/inbox");
     } catch {
       setApiError(t.errors.auditFailed);
@@ -96,13 +76,7 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {!isLoading && auditResult && (
-            <div className="mt-8">
-              <AuditReport result={auditResult} t={t} />
-            </div>
-          )}
-
-          {!isLoading && !auditResult && (
+          {!isLoading && (
             <div className="mt-8 flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white py-14 text-center shadow-card">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
                 <FileSearch className="h-6 w-6" />

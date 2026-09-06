@@ -11,6 +11,7 @@ interface SlideAuditPanelProps {
 }
 
 export function SlideAuditPanel({ entity, t }: SlideAuditPanelProps) {
+  if (!entity.audit) return null;
   const doc = entity.audit.document;
   const fields = [
     [t.document.carrierName, doc.carrierName],

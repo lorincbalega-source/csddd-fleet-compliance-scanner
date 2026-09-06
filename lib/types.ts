@@ -57,6 +57,8 @@ export interface AuditResult {
 
 export type ReviewStatus = "pending" | "approved" | "skipped";
 export type DocumentFileKind = "pdf" | "image" | "mock";
+export type ProcessingStatus = "queued" | "processing" | "ready" | "failed";
+export type QueueVisualStatus = "processing" | "ok" | "discrepancy" | "failed" | "approved";
 
 export interface DocumentPage {
   id: string;
@@ -71,11 +73,17 @@ export interface DocumentEntity {
   recipientName: string;
   recipientEmail: string;
   fileName: string;
+  originFileName?: string;
   fileKind: DocumentFileKind;
   fileUrl?: string;
+  thumbnailUrl?: string;
   pages: DocumentPage[];
-  audit: AuditResult;
+  audit: AuditResult | null;
   reviewStatus: ReviewStatus;
+  processingStatus: ProcessingStatus;
+  pageIndex?: number;
+  pageCount?: number;
+  errorMessage?: string;
 }
 
 export interface SendEmailPayload {

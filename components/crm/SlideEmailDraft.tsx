@@ -48,8 +48,21 @@ export function SlideEmailDraft({
 
     const fallback = composeFollowUpEmail(
       languageId,
-      entity.audit.document,
-      entity.audit.discrepancies.length
+      entity.audit?.document ?? {
+        carrierName: entity.recipientName,
+        shipper: "",
+        consignee: "",
+        vehiclePlate: "",
+        cargoWeight: "",
+        signaturePresent: false,
+        stampPresent: false,
+        documentDate: "",
+        documentType: "",
+        documentCategory: "unknown",
+        shipmentReference: entity.fileName,
+        riskLevel: "action_needed",
+      },
+      entity.audit?.discrepancies.length
         ? entity.audit.discrepancies
         : ["No blocking discrepancies. Confirm the file is complete on your side."],
     );
@@ -61,10 +74,10 @@ export function SlideEmailDraft({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           recipientLanguage: languageId,
-          document: entity.audit.document,
-          discrepancies: entity.audit.discrepancies,
-          checklist: entity.audit.checklist,
-          sourceFile: entity.audit.sourceFile,
+          document: entity.audit?.document,
+          discrepancies: entity.audit?.discrepancies ?? [],
+          checklist: entity.audit?.checklist ?? [],
+          sourceFile: entity.audit?.sourceFile,
         }),
       });
 
