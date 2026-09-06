@@ -26,6 +26,12 @@ export function setInboxQueue(entities: DocumentEntity[]): void {
   notify();
 }
 
+export function appendInboxEntities(entities: DocumentEntity[]): void {
+  if (!entities.length) return;
+  queue = [...queue, ...entities];
+  notify();
+}
+
 export function getInboxQueue(): DocumentEntity[] {
   return queue;
 }

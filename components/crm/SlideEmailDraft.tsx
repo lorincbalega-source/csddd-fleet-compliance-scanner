@@ -125,7 +125,7 @@ export function SlideEmailDraft({
       </div>
 
       <div
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-24"
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4"
         onWheelCapture={(event) => event.stopPropagation()}
       >
         {error && (

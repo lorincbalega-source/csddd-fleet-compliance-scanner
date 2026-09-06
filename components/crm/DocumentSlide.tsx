@@ -33,16 +33,19 @@ export function DocumentSlide({
   useEffect(() => {
     setTab("audit");
   }, [entity.id]);
+
   const ready = entity.processingStatus === "ready" && entity.audit;
   const failed = entity.processingStatus === "failed";
 
   return (
-    <article className="grid h-full min-h-0 w-full grid-cols-[minmax(0,1fr)_minmax(340px,420px)] overflow-hidden">
-      <DocumentViewer entity={entity} />
-      <aside className="flex h-full min-h-0 flex-col overflow-hidden border-l border-slate-200 bg-white">
+    <article className="flex h-full min-h-0 w-full flex-row overflow-hidden">
+      <div className="h-full w-1/2 min-w-0 overflow-hidden border-r border-neutral-800">
+        <DocumentViewer entity={entity} t={t} />
+      </div>
+      <aside className="flex h-full w-1/2 min-w-0 min-h-0 flex-col overflow-hidden bg-white">
         {ready && entity.audit ? (
           <>
-            <div className="flex h-10 shrink-0 border-b border-slate-200 px-2">
+            <div className="flex h-10 shrink-0 border-b border-neutral-200">
               <TabButton active={tab === "audit"} onClick={() => setTab("audit")}>
                 {t.crm.tabAudit}
               </TabButton>
@@ -66,24 +69,24 @@ export function DocumentSlide({
             </div>
           </>
         ) : (
-          <div className="flex h-full flex-col items-center justify-center gap-3 px-6 pb-20 text-center">
+          <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
             {failed ? (
               <>
-                <p className="text-sm font-semibold text-slate-800">{t.crm.analyzeFailed}</p>
-                <p className="text-xs text-slate-500">{entity.errorMessage ?? t.errors.auditFailed}</p>
+                <p className="text-sm font-semibold text-neutral-950">{t.crm.analyzeFailed}</p>
+                <p className="text-xs text-neutral-500">{entity.errorMessage ?? t.errors.auditFailed}</p>
                 <button
                   type="button"
                   onClick={() => retryEntity(entity.id)}
-                  className="mt-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-500"
+                  className="mt-2 h-10 rounded-md bg-neutral-950 px-4 text-sm font-semibold text-white"
                 >
                   {t.crm.retryAnalyze}
                 </button>
               </>
             ) : (
               <>
-                <Loader2 className="h-8 w-8 animate-spin text-brand-600" />
-                <p className="text-sm font-semibold text-slate-800">{t.crm.waitingFirst}</p>
-                <p className="text-xs text-slate-500">{entity.fileName}</p>
+                <Loader2 className="h-7 w-7 animate-spin text-neutral-950" />
+                <p className="text-sm font-semibold text-neutral-950">{t.crm.waitingFirst}</p>
+                <p className="text-xs text-neutral-500">{entity.fileName}</p>
               </>
             )}
           </div>
@@ -107,12 +110,12 @@ function TabButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "relative flex-1 px-2 text-sm font-semibold transition-colors",
-        active ? "text-slate-900" : "text-slate-400 hover:text-slate-700",
+        "relative h-full flex-1 text-sm font-semibold",
+        active ? "text-neutral-950" : "text-neutral-400 hover:text-neutral-700",
       )}
     >
       {children}
-      {active && <span className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-brand-600" />}
+      {active && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-neutral-950" />}
     </button>
   );
 }
