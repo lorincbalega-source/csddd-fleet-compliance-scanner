@@ -12,6 +12,7 @@ import { startBulkProcessor } from "@/lib/bulk-processor";
 import { prepareBulkInbox } from "@/lib/bulk-upload";
 import { isEntityReady } from "@/lib/queue-status";
 import { cn } from "@/lib/utils";
+import { useBetaAuth } from "@/components/PasswordGate";
 
 interface DocumentSlideDeckProps {
   initialQueue: DocumentEntity[];
@@ -24,6 +25,7 @@ type DraftState = Record<
 >;
 
 export function DocumentSlideDeck({ initialQueue, t }: DocumentSlideDeckProps) {
+  const betaAuth = useBetaAuth();
   const [documents, setDocuments] = useState<DocumentEntity[]>(initialQueue);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -205,6 +207,15 @@ export function DocumentSlideDeck({ initialQueue, t }: DocumentSlideDeckProps) {
           {isUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
           {t.crm.uploadMore}
         </button>
+        {betaAuth && (
+          <button
+            type="button"
+            onClick={betaAuth.logout}
+            className="shrink-0 text-xs font-medium text-neutral-500 transition-colors hover:text-neutral-200"
+          >
+            Logout
+          </button>
+        )}
       </header>
 
       <div
