@@ -13,6 +13,7 @@ import { prepareBulkInbox } from "@/lib/bulk-upload";
 import { isEntityReady } from "@/lib/queue-status";
 import { cn } from "@/lib/utils";
 import { useBetaAuth } from "@/components/PasswordGate";
+import { DockifyLogo } from "@/components/DockifyLogo";
 
 interface DocumentSlideDeckProps {
   initialQueue: DocumentEntity[];
@@ -184,8 +185,8 @@ export function DocumentSlideDeck({ initialQueue, t }: DocumentSlideDeckProps) {
   return (
     <div className="relative flex h-[100vh] max-h-[100vh] flex-col overflow-hidden bg-white text-neutral-950">
       <header className="flex h-12 max-h-12 shrink-0 items-center gap-3 border-b border-neutral-800 bg-neutral-950 px-4 text-white">
-        <Link href="/" className="shrink-0 text-sm font-semibold tracking-tight">
-          {t.app.name}
+        <Link href="/" className="min-w-0 shrink-0" aria-label={t.app.name}>
+          <DockifyLogo compact />
         </Link>
         <p className="min-w-0 flex-1 truncate text-center text-sm font-medium text-neutral-200">
           {counter}

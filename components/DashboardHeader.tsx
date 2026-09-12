@@ -1,4 +1,4 @@
-import { ShieldCheck } from "lucide-react";
+import { DockifyLogo } from "@/components/DockifyLogo";
 import type { Translations } from "@/lib/translations";
 
 interface DashboardHeaderProps {
@@ -9,13 +9,8 @@ export function DashboardHeader({ t }: DashboardHeaderProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <a href="#top" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white shadow-sm shadow-brand-900/40">
-            <ShieldCheck className="h-5 w-5" />
-          </div>
-          <span className="text-[15px] font-semibold tracking-tight text-white">
-            {t.app.name}
-          </span>
+        <a href="#top" className="min-w-0" aria-label={t.app.name}>
+          <DockifyLogo />
         </a>
 
         <nav className="hidden items-center gap-8 text-sm font-medium text-slate-300 md:flex">
