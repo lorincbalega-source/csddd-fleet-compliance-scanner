@@ -1,4 +1,4 @@
-import { DockifyLogo } from "@/components/DockifyLogo";
+import { Logo } from "@/components/Logo";
 import type { Translations } from "@/lib/translations";
 
 interface DashboardHeaderProps {
@@ -10,7 +10,7 @@ export function DashboardHeader({ t }: DashboardHeaderProps) {
     <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <a href="#top" className="min-w-0" aria-label={t.app.name}>
-          <DockifyLogo />
+          <Logo />
         </a>
 
         <nav className="hidden items-center gap-8 text-sm font-medium text-slate-300 md:flex">
