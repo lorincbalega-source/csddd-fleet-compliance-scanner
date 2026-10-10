@@ -26,7 +26,7 @@ export function SlideAuditPanel({ entity, t }: SlideAuditPanelProps) {
 
   return (
     <section className="flex h-full min-h-0 flex-col overflow-hidden bg-white">
-      <div className="flex shrink-0 items-center justify-between gap-3 px-4 pb-2 pt-3">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 px-4 pb-2 pt-3">
         <h2 className="text-sm font-semibold text-slate-900">{t.crm.extractedFields}</h2>
         <StatusBadge status={doc.riskLevel} label={getRiskLabel(doc.riskLevel, t)} size="md" />
       </div>
@@ -35,18 +35,18 @@ export function SlideAuditPanel({ entity, t }: SlideAuditPanelProps) {
         className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4"
         onWheelCapture={(event) => event.stopPropagation()}
       >
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {fields.map(([label, value]) => (
-            <div key={label} className="rounded-lg border border-slate-100 bg-slate-50 px-2.5 py-2">
+            <div key={label} className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{label}</p>
-              <p className="mt-0.5 truncate text-xs font-semibold text-slate-900" title={value}>
+              <p className="mt-0.5 break-words text-sm font-semibold text-slate-900">
                 {value}
               </p>
             </div>
           ))}
         </div>
 
-        <div className="mt-3 grid grid-cols-2 gap-2">
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <SealRow
             icon={PenLine}
             label={t.document.signaturePresent}
@@ -85,15 +85,17 @@ function SealRow({
   t: Translations;
 }) {
   return (
-    <div className="flex items-center justify-between gap-2 rounded-lg border border-slate-100 px-2.5 py-2">
-      <div className="flex items-center gap-1.5 text-xs font-medium text-slate-600">
-        <Icon className="h-3.5 w-3.5 text-slate-400" />
-        {label}
+    <div className="flex min-w-0 items-center justify-between gap-2 rounded-lg border border-slate-100 px-3 py-2.5">
+      <div className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-slate-600">
+        <Icon className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+        <span className="min-w-0 break-words">{label}</span>
       </div>
-      <StatusBadge
-        status={present ? "compliant" : "missing"}
-        label={present ? t.document.present : t.document.notPresent}
-      />
+      <span className="shrink-0">
+        <StatusBadge
+          status={present ? "compliant" : "missing"}
+          label={present ? t.document.present : t.document.notPresent}
+        />
+      </span>
     </div>
   );
 }

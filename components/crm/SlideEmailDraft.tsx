@@ -97,9 +97,9 @@ export function SlideEmailDraft({
 
   return (
     <section className="flex h-full min-h-0 flex-col overflow-hidden bg-white">
-      <div className="flex shrink-0 items-center justify-between gap-2 px-4 pb-2 pt-3">
-        <p className="text-[11px] text-slate-500">{t.crm.emailHint}</p>
-        <label className="min-w-[148px]">
+      <div className="flex shrink-0 flex-col gap-2 px-4 pb-2 pt-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="min-w-0 text-[11px] leading-snug text-slate-500">{t.crm.emailHint}</p>
+        <label className="w-full sm:min-w-[148px] sm:w-auto">
           <span className="sr-only">{t.email.recipientLanguage}</span>
           <select
             value={language}

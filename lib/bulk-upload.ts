@@ -8,9 +8,14 @@ import {
   setInboxQueue,
 } from "./inbox-store";
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
+export const MAX_FILE_SIZE = 10 * 1024 * 1024;
+export const MAX_UPLOAD_FILES = 10;
+export const UPLOAD_ACCEPT =
+  ".pdf,.docx,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
-export function isAcceptedUpload(file: File): boolean {
+export type UploadFileError = "invalidFileType" | "fileTooLarge" | "tooManyFiles";
+
+export function classifyUpload(file: File): "ok" | "type" | "size" {
   const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
   const isImage =
     file.type.startsWith("image/") ||
@@ -19,7 +24,59 @@ export function isAcceptedUpload(file: File): boolean {
   const isDocx =
     file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
     ext === ".docx";
-  return (isImage || isPdf || isDocx) && file.size > 0 && file.size <= MAX_FILE_SIZE;
+  if (!(isImage || isPdf || isDocx) || file.size <= 0) return "type";
+  if (file.size > MAX_FILE_SIZE) return "size";
+  return "ok";
+}
+
+export function isAcceptedUpload(file: File): boolean {
+  return classifyUpload(file) === "ok";
+}
+
+export function mergeUploadedFiles(
+  existing: File[],
+  incoming: File[],
+  options?: { maxFiles?: number; currentCount?: number },
+): { files: File[]; added: File[]; error: UploadFileError | null } {
+  const maxFiles = options?.maxFiles ?? MAX_UPLOAD_FILES;
+  const currentCount = options?.currentCount ?? existing.length;
+  const names = new Set(existing.map((file) => `${file.name}:${file.size}`));
+  const merged = [...existing];
+  const added: File[] = [];
+  let typeError = false;
+  let sizeError = false;
+  let tooMany = false;
+
+  for (const file of incoming) {
+    const key = `${file.name}:${file.size}`;
+    if (names.has(key)) continue;
+    const classification = classifyUpload(file);
+    if (classification === "type") {
+      typeError = true;
+      continue;
+    }
+    if (classification === "size") {
+      sizeError = true;
+      continue;
+    }
+    if (currentCount + added.length >= maxFiles) {
+      tooMany = true;
+      continue;
+    }
+    names.add(key);
+    merged.push(file);
+    added.push(file);
+  }
+
+  const error: UploadFileError | null = tooMany
+    ? "tooManyFiles"
+    : sizeError
+      ? "fileTooLarge"
+      : typeError
+        ? "invalidFileType"
+        : null;
+
+  return { files: merged, added, error };
 }
 
 export async function prepareBulkInbox(

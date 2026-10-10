@@ -12,52 +12,47 @@ import {
 } from "lucide-react";
 import type { Translations } from "@/lib/translations";
 import { cn } from "@/lib/utils";
-import { isAcceptedUpload } from "@/lib/bulk-upload";
+import { MAX_UPLOAD_FILES, UPLOAD_ACCEPT } from "@/lib/bulk-upload";
 
 interface FileUploadZoneProps {
   t: Translations;
   isLoading: boolean;
+  uploadedFiles: File[];
+  onFilesChange: (files: File[]) => void;
+  onAddFiles: (files: FileList | File[]) => void;
   onAudit: (files: File[], useMock: boolean) => void;
+  canRemoveFiles?: boolean;
+  onFileError?: (message: string | null) => void;
 }
 
-export function FileUploadZone({ t, isLoading, onAudit }: FileUploadZoneProps) {
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+export function FileUploadZone({
+  t,
+  isLoading,
+  uploadedFiles,
+  onFilesChange,
+  onAddFiles,
+  onAudit,
+  canRemoveFiles = true,
+  onFileError,
+}: FileUploadZoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
 
+  const reportError = useCallback(
+    (message: string | null) => {
+      setError(message);
+      onFileError?.(message);
+    },
+    [onFileError],
+  );
+
   const addFiles = useCallback(
     (incoming: FileList | File[]) => {
-      const next = Array.from(incoming);
-      const valid: File[] = [];
-      let rejected = false;
-      for (const file of next) {
-        if (isAcceptedUpload(file)) {
-          valid.push(file);
-        } else {
-          rejected = true;
-        }
-      }
-      if (rejected && valid.length === 0) {
-        setError(t.errors.invalidFileType);
-        return;
-      }
-      setError(rejected ? t.errors.invalidFileType : null);
-      setSelectedFiles((prev) => {
-        const names = new Set(prev.map((file) => `${file.name}:${file.size}`));
-        const merged = [...prev];
-        for (const file of valid) {
-          const key = `${file.name}:${file.size}`;
-          if (!names.has(key)) {
-            names.add(key);
-            merged.push(file);
-          }
-        }
-        return merged;
-      });
+      onAddFiles(incoming);
     },
-    [t],
+    [onAddFiles],
   );
 
   const onDrop = useCallback(
@@ -70,16 +65,16 @@ export function FileUploadZone({ t, isLoading, onAudit }: FileUploadZoneProps) {
   );
 
   const handleRunAudit = () => {
-    if (!selectedFiles.length) {
-      setError(t.errors.noFile);
+    if (!uploadedFiles.length) {
+      reportError(t.errors.noFile);
       return;
     }
-    onAudit(selectedFiles, false);
+    onAudit(uploadedFiles, false);
   };
 
   const handleLoadSample = () => {
-    setSelectedFiles([]);
-    setError(null);
+    onFilesChange([]);
+    reportError(null);
     onAudit([], true);
   };
 
@@ -112,7 +107,7 @@ export function FileUploadZone({ t, isLoading, onAudit }: FileUploadZoneProps) {
           <input
             ref={inputRef}
             type="file"
-            accept="image/*,application/pdf"
+            accept={UPLOAD_ACCEPT}
             multiple
             className="hidden"
             onChange={(e) => {
@@ -163,13 +158,15 @@ export function FileUploadZone({ t, isLoading, onAudit }: FileUploadZoneProps) {
           </div>
         </div>
 
-        {selectedFiles.length > 0 && (
+        {uploadedFiles.length > 0 && (
           <div className="mt-4 space-y-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              {t.upload.selectedCount.replace("{count}", String(selectedFiles.length))}
+              {t.upload.fileCount
+                .replace("{count}", String(uploadedFiles.length))
+                .replace("{max}", String(MAX_UPLOAD_FILES))}
             </p>
             <ul className="max-h-48 space-y-2 overflow-y-auto">
-              {selectedFiles.map((file, index) => (
+              {uploadedFiles.map((file, index) => (
                 <li
                   key={`${file.name}-${file.size}-${index}`}
                   className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
@@ -183,17 +180,19 @@ export function FileUploadZone({ t, isLoading, onAudit }: FileUploadZoneProps) {
                       <p className="text-xs text-slate-400">{(file.size / 1024).toFixed(1)} KB</p>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedFiles((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
-                      setError(null);
-                    }}
-                    className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
-                    aria-label={t.upload.removeFile}
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+                  {canRemoveFiles && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onFilesChange(uploadedFiles.filter((_, itemIndex) => itemIndex !== index));
+                        reportError(null);
+                      }}
+                      className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
+                      aria-label={t.upload.removeFile}
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>

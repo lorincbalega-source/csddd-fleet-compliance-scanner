@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 import { DocumentViewer } from "@/components/crm/DocumentViewer";
 import { SlideAuditPanel } from "@/components/crm/SlideAuditPanel";
@@ -17,6 +17,7 @@ interface DocumentSlideProps {
   onLanguageChange: (languageId: string) => void;
   email: FollowUpEmail;
   onEmailChange: (email: FollowUpEmail) => void;
+  action?: ReactNode;
 }
 
 type SideTab = "audit" | "email";
@@ -28,6 +29,7 @@ export function DocumentSlide({
   onLanguageChange,
   email,
   onEmailChange,
+  action,
 }: DocumentSlideProps) {
   const [tab, setTab] = useState<SideTab>("audit");
   useEffect(() => {
@@ -38,14 +40,14 @@ export function DocumentSlide({
   const failed = entity.processingStatus === "failed";
 
   return (
-    <article className="flex h-full min-h-0 w-full flex-row overflow-hidden">
-      <div className="h-full w-1/2 min-w-0 overflow-hidden border-r border-neutral-800">
+    <article className="flex h-full min-h-0 w-full flex-col overflow-hidden transition-[flex-direction] duration-300 ease-out lg:flex-row">
+      <div className="h-[45vh] w-full shrink-0 overflow-hidden border-b border-neutral-800 lg:h-full lg:w-[45%] lg:border-b-0 lg:border-r">
         <DocumentViewer entity={entity} t={t} />
       </div>
-      <aside className="flex h-full w-1/2 min-w-0 min-h-0 flex-col overflow-hidden bg-white">
+      <aside className="flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-white lg:h-full lg:w-[55%]">
         {ready && entity.audit ? (
           <>
-            <div className="flex h-10 shrink-0 border-b border-neutral-200">
+            <div className="flex min-h-12 shrink-0 border-b border-neutral-200">
               <TabButton active={tab === "audit"} onClick={() => setTab("audit")}>
                 {t.crm.tabAudit}
               </TabButton>
@@ -69,7 +71,7 @@ export function DocumentSlide({
             </div>
           </>
         ) : (
-          <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
+          <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
             {failed ? (
               <>
                 <p className="text-sm font-semibold text-neutral-950">{t.crm.analyzeFailed}</p>
@@ -86,11 +88,16 @@ export function DocumentSlide({
               <>
                 <Loader2 className="h-7 w-7 animate-spin text-neutral-950" />
                 <p className="text-sm font-semibold text-neutral-950">{t.crm.waitingFirst}</p>
-                <p className="text-xs text-neutral-500">{entity.fileName}</p>
+                <p className="min-w-0 break-words text-xs text-neutral-500">{entity.fileName}</p>
               </>
             )}
           </div>
         )}
+        {action ? (
+          <div className="shrink-0 border-t border-neutral-200 bg-white p-3">
+            {action}
+          </div>
+        ) : null}
       </aside>
     </article>
   );
@@ -103,14 +110,15 @@ function TabButton({
 }: {
   active: boolean;
   onClick: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        "relative h-full flex-1 text-sm font-semibold",
+        "relative flex min-h-12 min-w-0 flex-1 items-center justify-center px-2 py-2 text-center text-xs font-semibold leading-snug transition-colors duration-200 sm:text-sm",
+        "whitespace-normal break-words",
         active ? "text-neutral-950" : "text-neutral-400 hover:text-neutral-700",
       )}
     >

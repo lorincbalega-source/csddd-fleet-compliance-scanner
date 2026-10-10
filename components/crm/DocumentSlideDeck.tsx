@@ -219,10 +219,7 @@ export function DocumentSlideDeck({ initialQueue, t }: DocumentSlideDeckProps) {
         )}
       </header>
 
-      <div
-        className="relative overflow-hidden"
-        style={{ height: "calc(100vh - 48px - 60px)" }}
-      >
+      <div className="relative min-h-0 flex-1 overflow-hidden">
         <div
           className="flex h-full transition-transform duration-400 ease-out"
           style={{
@@ -249,6 +246,30 @@ export function DocumentSlideDeck({ initialQueue, t }: DocumentSlideDeckProps) {
                         item.audit?.followUpEmail ?? { subject: "", body: "" }
                   }
                   onEmailChange={item.id === entity?.id ? setEmail : () => undefined}
+                  action={
+                    <div className="flex w-full flex-col gap-2">
+                      {item.id === entity?.id && error ? (
+                        <p className="text-xs font-medium text-red-600" role="alert">
+                          {error}
+                        </p>
+                      ) : null}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (item.id === entity?.id) void approveAndNext();
+                        }}
+                        disabled={isSubmitting || complete || !isEntityReady(item)}
+                        className={cn(
+                          "inline-flex h-10 w-full items-center justify-center rounded-md bg-neutral-950 px-4 text-sm font-semibold text-white transition-colors duration-200",
+                          isSubmitting || complete || !isEntityReady(item)
+                            ? "opacity-50"
+                            : "hover:bg-neutral-800",
+                        )}
+                      >
+                        {isSubmitting && item.id === entity?.id ? t.crm.sending : t.crm.approveNext}
+                      </button>
+                    </div>
+                  }
                 />
               ) : (
                 <div className="h-full bg-neutral-100" />
@@ -257,25 +278,6 @@ export function DocumentSlideDeck({ initialQueue, t }: DocumentSlideDeckProps) {
           ))}
         </div>
       </div>
-
-      <footer className="flex h-[60px] max-h-[60px] shrink-0 items-center justify-end gap-3 border-t border-neutral-200 bg-white px-4">
-        {error && (
-          <p className="mr-auto truncate text-xs font-medium text-red-600" role="alert">
-            {error}
-          </p>
-        )}
-        <button
-          type="button"
-          onClick={() => void approveAndNext()}
-          disabled={isSubmitting || complete || !isEntityReady(entity)}
-          className={cn(
-            "inline-flex h-10 items-center rounded-md bg-neutral-950 px-5 text-sm font-semibold text-white",
-            isSubmitting || complete ? "opacity-50" : "hover:bg-neutral-800",
-          )}
-        >
-          {isSubmitting ? t.crm.sending : t.crm.approveSendNext}
-        </button>
-      </footer>
 
       {complete && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/70 p-6">
