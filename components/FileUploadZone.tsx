@@ -22,6 +22,7 @@ interface FileUploadZoneProps {
   onAddFiles: (files: FileList | File[]) => void;
   onAudit: (files: File[], useMock: boolean) => void;
   canRemoveFiles?: boolean;
+  showFileList?: boolean;
   onFileError?: (message: string | null) => void;
 }
 
@@ -33,6 +34,7 @@ export function FileUploadZone({
   onAddFiles,
   onAudit,
   canRemoveFiles = true,
+  showFileList = true,
   onFileError,
 }: FileUploadZoneProps) {
   const [isDragging, setIsDragging] = useState(false);
@@ -50,9 +52,10 @@ export function FileUploadZone({
 
   const addFiles = useCallback(
     (incoming: FileList | File[]) => {
+      reportError(null);
       onAddFiles(incoming);
     },
-    [onAddFiles],
+    [onAddFiles, reportError],
   );
 
   const onDrop = useCallback(
@@ -118,7 +121,7 @@ export function FileUploadZone({
           <input
             ref={cameraRef}
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,.jpg,.jpeg,.png"
             capture="environment"
             className="hidden"
             onChange={(e) => {
@@ -158,7 +161,7 @@ export function FileUploadZone({
           </div>
         </div>
 
-        {uploadedFiles.length > 0 && (
+        {showFileList && uploadedFiles.length > 0 && (
           <div className="mt-4 space-y-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
               {t.upload.fileCount

@@ -15,16 +15,19 @@ export const UPLOAD_ACCEPT =
 
 export type UploadFileError = "invalidFileType" | "fileTooLarge" | "tooManyFiles";
 
+const ALLOWED_EXTENSIONS = new Set([".pdf", ".docx", ".jpg", ".jpeg", ".png"]);
+const ALLOWED_TYPES = new Set([
+  "application/pdf",
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]);
+
 export function classifyUpload(file: File): "ok" | "type" | "size" {
   const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
-  const isImage =
-    file.type.startsWith("image/") ||
-    [".jpg", ".jpeg", ".png", ".webp", ".heic", ".gif"].includes(ext);
-  const isPdf = file.type === "application/pdf" || ext === ".pdf";
-  const isDocx =
-    file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-    ext === ".docx";
-  if (!(isImage || isPdf || isDocx) || file.size <= 0) return "type";
+  const allowedType = ALLOWED_TYPES.has(file.type) || ALLOWED_EXTENSIONS.has(ext);
+  if (!allowedType || file.size <= 0) return "type";
   if (file.size > MAX_FILE_SIZE) return "size";
   return "ok";
 }

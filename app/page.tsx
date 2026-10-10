@@ -51,8 +51,12 @@ export default function DashboardPage() {
       setApiError(result.error ? t.errors[result.error] : null);
 
       if (hasStartedAudit && result.added.length) {
+        const firstNewIndex = documents.length;
         void prepareBulkInbox(result.added, { append: documents.length > 0 })
-          .then(() => startBulkProcessor())
+          .then(() => {
+            startBulkProcessor();
+            setActiveIndex(firstNewIndex);
+          })
           .catch(() => setApiError(t.errors.auditFailed));
       }
     },
@@ -98,14 +102,22 @@ export default function DashboardPage() {
 
   const switcherItems = useMemo<SwitcherItem[]>(() => {
     if (hasStartedAudit && documents.length) {
-      return documents.map((entity) => ({
-        id: entity.id,
-        name: entity.originFileName ?? entity.fileName,
-        status: statusForEntity(entity),
-        categoryLabel: entity.audit
-          ? t.documentCategory[entity.audit.document.documentCategory]
-          : undefined,
-      }));
+      const categoryCounts: Partial<Record<string, number>> = {};
+      return documents.map((entity) => {
+        const name = entity.originFileName ?? entity.fileName;
+        if (!entity.audit) {
+          return { id: entity.id, name, status: statusForEntity(entity) };
+        }
+        const category = entity.audit.document.documentCategory;
+        const count = (categoryCounts[category] ?? 0) + 1;
+        categoryCounts[category] = count;
+        return {
+          id: entity.id,
+          name,
+          status: statusForEntity(entity),
+          categoryLabel: `${t.documentCategory[category]} ${count}`,
+        };
+      });
     }
 
     return uploadedFiles.map((file, index) => ({
@@ -135,6 +147,7 @@ export default function DashboardPage() {
               onAddFiles={addUploadedFiles}
               onAudit={handleAudit}
               canRemoveFiles={!hasStartedAudit && !isLoading}
+              showFileList={!hasStartedAudit}
               onFileError={setApiError}
             />
           </div>

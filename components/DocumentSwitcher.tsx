@@ -20,7 +20,7 @@ interface DocumentSwitcherProps {
   items: SwitcherItem[];
   activeIndex: number;
   onSelect: (index: number) => void;
-  onAddFiles: (files: FileList) => void;
+  onAddFiles: (files: FileList | File[]) => void;
   canAddMore: boolean;
 }
 
@@ -112,8 +112,9 @@ export function DocumentSwitcher({
                 ref={active ? activeRef : undefined}
                 type="button"
                 onClick={() => onSelect(index)}
+                aria-current={active ? "true" : undefined}
                 className={cn(
-                  "min-w-[11rem] max-w-[16rem] shrink-0 rounded-xl border px-3 py-2.5 text-left transition-colors",
+                  "min-w-[10.5rem] max-w-[16rem] shrink-0 rounded-xl border px-3 py-2.5 text-left transition-colors",
                   active
                     ? "border-brand-500 bg-brand-50 ring-2 ring-brand-500/30"
                     : "border-slate-200 bg-slate-50 hover:border-brand-300 hover:bg-white",
